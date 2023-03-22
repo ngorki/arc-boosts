@@ -135,7 +135,7 @@ selectButton.addEventListener('click', () => {
 
 const handleChat = async () => {
   // Set your OpenAI API key
-  const openaiApiKey = "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";
+  const openaiApiKey = process.env.OPENAI_APIKEY;
   if (openaiApiKey === "OPENAI_API_KEY") {
     info.innerHTML = "Oops, looks like you haven't entered your OpenAI API Key"
     return;
