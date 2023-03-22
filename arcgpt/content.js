@@ -8,6 +8,7 @@ const chatBox = document.createElement('div');
 const responseBox = document.createElement('div');
 const info = document.createElement('p');
 const chatAndInfo = document.createElement('div');
+const contextOn = document.createElement('div');
 
 chatButton.innerText = '💬';
 chatButton.id = 'chatButton';
@@ -22,16 +23,26 @@ chatBox.style.display = 'none';
 chatBox.id = 'inputContainer';
 chatContainer.className = 'chatContainer';
 
-
 responseBox.id = 'outputContainer';
 responseBox.style.display = 'none';
 
 info.id = 'info';
 info.style.display = 'none';
+
+contextOn.id = 'context-toggle'
+contextOn.innerHTML = `
+  <p id="context-toggle">Read Page</p>
+  <label class="switch">
+    <input type="checkbox" id="read-page" checked>
+    <span class="slider round"></span>
+  </label>
+`;
+contextOn.style.display = 'none';
+
 chatAndInfo.id = 'topRow';
 chatAndInfo.appendChild(chatButton);
 chatAndInfo.appendChild(info);
-
+chatAndInfo.appendChild(contextOn);
 
 chatContainer.appendChild(chatAndInfo);
 chatContainer.appendChild(responseBox);
@@ -44,12 +55,14 @@ const clearButton = document.querySelector('#clearButton');
 
 let isChatBoxVisible = false;
 
+// Expands button into window
 chatButton.addEventListener('click', () => {
   if (isChatBoxVisible) {
     chatButton.innerHTML = "💬";
     chatBox.style.display = 'none';
     responseBox.style.display = 'none';
     info.style.display = 'none';
+    contextOn.style.display = 'none';
   }
   else {
     chatButton.innerHTML = "X";
@@ -57,6 +70,7 @@ chatButton.addEventListener('click', () => {
     info.innerHTML = 'Ask a question to get started!'
     chatBox.style.display = 'flex';
     responseBox.style.display = 'flex';
+    contextOn.style.display = 'flex';
     chatInput.focus();
   }
   isChatBoxVisible = !isChatBoxVisible;
@@ -65,6 +79,8 @@ chatButton.addEventListener('click', () => {
 let userInputs = [];
 let assistantInputs = [];
 
+
+// Listens for clicks on clean button, clean screen
 let clearCheck = false;
 clearButton.addEventListener('click', () => {
   if (clearCheck) {
@@ -84,8 +100,9 @@ clearButton.addEventListener('click', () => {
 
 });
 
+// What are we listening for here?
 document.addEventListener('click', (e) => {
-  if (clearCheck && e.target.id !== "clearButton" ) {
+  if (clearCheck && e.target.id !== "clearButton") {
     clearCheck = false;
     userInputs = [];
     assistantInputs = [];
@@ -95,12 +112,12 @@ document.addEventListener('click', (e) => {
   }
 })
 
-
+// Expands input box
 chatInput.addEventListener('input', () => {
   if (chatInput.scrollHeight >= 60) {
     chatInput.style.height = '60px'
   }
-  else if(chatInput.scrollHeight >= 40) {
+  else if (chatInput.scrollHeight >= 40) {
     chatInput.style.height = chatInput.scrollHeight + 'px';
   }
 });
@@ -110,14 +127,14 @@ let selecting = false;
 let selectedText = ""
 const selectButton = document.querySelector('#selectButton');
 selectButton.addEventListener('click', () => {
-  if(selecting){
+  if (selecting) {
     selectedText = window.getSelection().toString()
     let firstWord = selectedText.split(" ")[0];
-    if (firstWord === ""){
+    if (firstWord === "") {
       info.innerHTML = "Ask a question to get started!"
     }
     else {
-      if (firstWord.length > 8){
+      if (firstWord.length > 8) {
         firstWord = firstWord.slice(0, 8) + "...";
       }
       info.innerHTML = `Using selection starting with: ${firstWord}`
@@ -135,7 +152,7 @@ selectButton.addEventListener('click', () => {
 
 const handleChat = async () => {
   // Set your OpenAI API key
-  const openaiApiKey = process.env.OPENAI_APIKEY;
+  const openaiApiKey = "OPENAI_API_KEY";
   if (openaiApiKey === "OPENAI_API_KEY") {
     info.innerHTML = "Oops, looks like you haven't entered your OpenAI API Key"
     return;
@@ -155,10 +172,10 @@ const handleChat = async () => {
   sendButton.disabled = true;
   let text = "";
 
-  if (selectedText !== ""){
+  if (selectedText !== "") {
     text = selectedText
   }
-  else{
+  else {
     text = document.body.innerText;
   }
 
@@ -171,22 +188,32 @@ const handleChat = async () => {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
   headers.append("Authorization", `Bearer ${openaiApiKey}`);
-  const messages = [
-      { role: "system", content: `You are a helpful assistant named Archie, built as a Boost for the Arc Browser. 
+  const messages = []
+
+  if (!document.getElementById("read-page").checked) {
+    messages.push(
+      {
+        role: "system",
+        content: "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."
+      }
+    )
+  } else {
+    messages.push(
+      {
+        role: "system", content: `You are a helpful assistant named Archie, built as a Boost for the Arc Browser. 
       Your role is to answer questions relating in some way to the content on the web page that the user is currently on, or is currently highlighting.
       You only have available data from the page given in this system message, and are not able to search up additional information. 
       The following content represents the page the user is on, and any questions about the current webpage or website refer to that content.
 
       Page Content: 
-      ${text}` },
-
-
-  ]
+      ${text}`
+      })
+  }
 
   const zipped = userInputs.map((element, index) => [element, assistantInputs[index]]);
   for (const [user, assistant] of zipped) {
-    messages.push({role: 'user', content: user},
-                  {role: 'assistant', content: assistant})
+    messages.push({ role: 'user', content: user },
+      { role: 'assistant', content: assistant })
   }
 
   messages.push({ role: "user", content: userInput })
@@ -198,15 +225,15 @@ const handleChat = async () => {
     messages: messages,
   };
 
-    // Send request to OpenAI GPT API
-    fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(requestBody),
-      }
-    )
+  // Send request to OpenAI GPT API
+  fetch(
+    "https://api.openai.com/v1/chat/completions",
+    {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(requestBody),
+    }
+  )
     .then(
       res => {
         if (res.status === 400) {
@@ -215,14 +242,18 @@ const handleChat = async () => {
           return;
         }
         return res.json();
-    })
+      })
     .then(json => {
       // handle response normally here
       let result = json;
-      if (result.choices && result.choices.length >0){
+      if (result.choices && result.choices.length > 0) {
         let textOutput = result.choices[0].message.content;
         if (responseElement.innerHTML === "Thinking...") {
-          responseElement.innerHTML = "Archie: ";
+          if (document.getElementById("read-page").checked) {
+            response.innerHTML = "ChatGPT: ";
+          } else {
+            responseElement.innerHTML = "Archie: ";
+          }
         }
         responseElement.innerHTML += textOutput;
         assistantInputs.push(textOutput);
@@ -231,7 +262,7 @@ const handleChat = async () => {
     })
     .catch(error => {
       // Handle error
-      if (responseElement.innerHTML !== "This page is too big! Use the highlight tool to select a smaller section"){
+      if (responseElement.innerHTML !== "This page is too big! Use the highlight tool to select a smaller section") {
         console.log(error)
         responseElement.innerHTML = "Oops, that's an error. Try again!";
         assistantInputs.push("<error, ignore>");
@@ -249,7 +280,7 @@ sendButton.addEventListener('click', () => {
 chatInput.addEventListener('keydown', (event) => {
   if (chatInput.value !== "") {
     if (event.key === 'Enter') {
-        handleChat()
+      handleChat()
     }
   }
 });
