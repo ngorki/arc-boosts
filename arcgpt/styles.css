@@ -1,0 +1,149 @@
+/**
+ * Boost Source: https://arcboosts.com/boosts/85/arc-chat#code_block
+ */
+
+/* --arc-background-gradient-overlay-color0
+--arc-palette-cutoutColor
+--arc-background-gradient-color0
+--arc-background-gradient-overlay-color1
+--arc-palette-minContrastColor
+--arc-palette-foregroundSecondary
+--arc-palette-hover
+--arc-palette-focus
+--arc-palette-foregroundPrimary
+--arc-palette-foregroundTertiary
+--arc-palette-maxContrastColor
+--arc-palette-background
+--arc-palette-backgroundExtra
+--arc-background-gradient-color1
+--arc-palette-subtitle
+--arc-palette-title */
+
+.chatContainer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    background-color: var(--arc-palette-background, black);
+    border-radius: 5px;
+    max-width: 450px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 0px 7.5px black;
+}
+
+.chatContainer * {
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;
+    display: flex;
+    font-size: 18px;
+}
+
+.chatContainer button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+#chatButton {
+    background-color: var(--arc-palette-cutoutColor, royalblue);
+    color: var(--arc-palette-foregroundPrimary, white);
+    border-radius: 25%;
+    margin: 5px;
+    height: 30px;
+    width: 30px;
+    border: none;
+    cursor: pointer;
+}
+
+#topRow {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+#info {
+    color: var(--arc-palette-foregroundPrimary, white);
+    /* display: inline-block; */
+    margin: auto; 
+    margin-left: 5px;
+    /* text-align: center;h */
+}
+
+#chatBox {
+    display: none;
+    all: initial;
+}
+
+#outputContainer {
+    background-color: var(--arc-palette-minContrastColor, grey);
+    /* margin: 10px 10px 10px 10px; */
+    border-radius: 5px;
+    max-width: 450px;
+    max-height: 500px;
+    overflow: auto;
+    flex-direction: column;
+    margin: 5px;
+}
+
+#inputContainer {
+    margin: 5px;
+}
+
+#inputContainer *:not(#selectButton) {
+    margin-left: 5px;
+}
+
+.messageElement {
+    background-color: var(--arc-palette-minContrastColor, grey);
+    /* color: white; */
+    color: var(--arc-palette-title, white);
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 0 !important;
+}
+
+#selectButton {
+    background-color: var(--arc-palette-cutoutColor, royalblue);
+    color: var(--arc-palette-title, white);
+    border-radius: 25%;
+    border: none;
+    /* margin-bottom: 10px;
+    margin-left: 5px; */
+    height: 30px;
+    width: 30px;
+}
+
+#clearButton, #sendButton {
+    background-color: var(--arc-palette-cutoutColor, royalblue);
+    color: var(--arc-palette-title, white);
+    border-radius: 25%;
+    border: none;
+    /* margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 5px; */
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
+}
+
+#chatInput {
+    width: 300px;
+    /* margin-bottom: -5px; */
+    resize: none;
+    /* display: inline-block; */
+    height: 30px;
+    padding: 2.5px;
+    justify-content: start;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+    overflow: hidden;
+}
+
+
+
+
+borebi
